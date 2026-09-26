@@ -1,0 +1,31 @@
+name: one_ui
+description: The Aso-oke design system of Devstrike One for Flutter (tokens, theme, woven motif, core components).
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^8.2.1
+  meta: ^1.16.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^11.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    # Phosphor 2.1 icon fonts (MIT), vendored; see lib/src/icons/one_icons.dart.
+    - family: Phosphor
+      fonts:
+        - asset: fonts/Phosphor.ttf
+    - family: PhosphorFill
+      fonts:
+        - asset: fonts/Phosphor-Fill.ttf
