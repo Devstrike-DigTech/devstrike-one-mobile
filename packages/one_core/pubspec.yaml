@@ -1,0 +1,22 @@
+name: one_core
+description: Configuration, flavours, logging, result and failure types, money and clock for the Devstrike One apps.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  clock: ^1.1.3
+  flutter:
+    sdk: flutter
+  intl: ^0.20.2
+  logging: ^1.3.0
+  meta: ^1.16.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^11.0.0
