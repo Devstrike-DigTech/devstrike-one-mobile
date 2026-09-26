@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the pinned Flutter version
+        id: fvm
+        run: echo "flutter=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.flutter }}
+          cache: true
+
+      - name: Resolve the workspace
+        run: flutter pub get
+
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Tokens are in sync with the snapshot
+        run: dart run tool/sync_tokens.dart --check
+
+      - name: Analyze tooling
+        run: dart analyze --fatal-infos tool
+
+      - name: Analyze apps and packages
+        run: dart run melos run analyze --no-select
+
+      - name: Test
+        run: dart run melos run test --no-select
+
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: packages/*/test/**/failures/
+          if-no-files-found: ignore
+
+  android:
+    name: Debug APK (${{ matrix.app }})
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [one_app, one_business]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the pinned Flutter version
+        id: fvm
+        run: echo "flutter=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.flutter }}
+          cache: true
+
+      - name: Resolve the workspace
+        run: flutter pub get
+
+      - name: Build
+        working-directory: apps/${{ matrix.app }}
+        run: flutter build apk --debug --flavor staging --dart-define-from-file=../../config/staging.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-staging-debug-apk
+          path: apps/${{ matrix.app }}/build/app/outputs/flutter-apk/*.apk
+          retention-days: 14
