@@ -1,0 +1,38 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+*.g.dart.bak
+
+# Golden test failures (the committed goldens live in test/goldens/)
+**/test/**/failures/
+
+# FVM
+.fvm/flutter_sdk
+.fvm/versions
+.fvm/release
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local configuration (never commit secrets)
+config/*.local.json
+*.env
+key.properties
+*.keystore
+*.jks

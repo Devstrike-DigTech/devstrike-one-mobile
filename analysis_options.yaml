@@ -1,0 +1,25 @@
+# Shared, strict lints for every member of the workspace. Members include this
+# file; do not relax rules locally without a comment explaining why.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    todo: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/build/**"
+
+linter:
+  rules:
+    # Public API docs are required in packages; apps opt out in their own file.
+    public_member_api_docs: true
+    # Line length is handled by `dart format`.
+    lines_longer_than_80_chars: false
+    # Dart 3.13 allows `new(...)` in place of the class name in constructors.
+    # We keep the classic form: it reads the same on every toolchain the team
+    # uses and matches the Flutter framework's own style.
+    unnecessary_type_name_in_constructor: false

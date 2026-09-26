@@ -1,0 +1,71 @@
+name: devstrike_one_mobile
+description: Devstrike One mobile workspace (One and One Business apps plus shared packages).
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+# Dart pub workspace: one resolution, one pubspec.lock, one .dart_tool for
+# every app and package below.
+workspace:
+  - apps/one_app
+  - apps/one_business
+  - packages/one_api
+  - packages/one_auth
+  - packages/one_core
+  - packages/one_ui
+
+dev_dependencies:
+  melos: ^8.9.0
+
+melos:
+  repository: https://github.com/Devstrike-DigTech/devstrike-one-mobile
+
+  command:
+    bootstrap:
+      # The pub workspace already links every member; bootstrap just runs
+      # `pub get` once at the root.
+      runPubGetInParallel: false
+
+  scripts:
+    analyze:
+      description: Static analysis for every app and package (infos and warnings fail).
+      exec: flutter analyze --fatal-infos --fatal-warnings .
+      concurrency: 1
+
+    format:
+      description: Format all Dart sources.
+      run: dart format .
+
+    format:check:
+      description: Fail when any Dart file is not formatted.
+      run: dart format --output=none --set-exit-if-changed .
+
+    test:
+      description: Unit, widget and golden tests in every member that has a test folder.
+      exec: flutter test --no-pub
+      concurrency: 1
+      packageFilters:
+        dirExists: test
+
+    test:goldens:update:
+      description: Re-record golden files (review the images before committing).
+      exec: flutter test --no-pub --update-goldens
+      concurrency: 1
+      packageFilters:
+        dirExists: test
+
+    tokens:sync:
+      description: Regenerate one_ui tokens from devstrike-one/packages/design-tokens/tokens.json.
+      run: dart run tool/sync_tokens.dart
+
+    tokens:check:
+      description: Fail when the generated tokens are stale.
+      run: dart run tool/sync_tokens.dart --check
+
+    build:apk:debug:
+      description: Debug APKs of both apps, staging flavour (needs the Android SDK).
+      exec: flutter build apk --debug --flavor staging --dart-define-from-file=../../config/staging.json
+      concurrency: 1
+      packageFilters:
+        dirExists: android

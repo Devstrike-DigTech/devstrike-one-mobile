@@ -1,0 +1,5 @@
+{
+  "ONE_FLAVOR": "production",
+  "ONE_API_BASE_URL": "https://api.devstrike.one",
+  "ONE_OIDC_ISSUER": "https://id.devstrike.one"
+}
