@@ -163,7 +163,7 @@ void main() {
           onSearch(api, [palmwine]);
           api.onGet(
             OneApiPaths.marketplaceListing(palmwine['id']! as String),
-            (s) => s.reply(200, palmwine),
+            (s) => s.reply(200, palmwineDetail),
           );
         },
       );

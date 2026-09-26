@@ -52,9 +52,14 @@ class OneApiClient {
   /// The underlying Dio instance (for adapters in tests).
   Dio get dio => _dio;
 
-  /// `GET /health`.
+  /// `GET /api/v1/health`: the process answers.
   Future<Result<HealthStatus>> health() =>
       _get(OneApiPaths.health, HealthStatus.fromJson);
+
+  /// `GET /api/v1/health/ready`: database and Redis answer too. A 503 here
+  /// is a `ServerFailure` whose `details` hold the failing checks.
+  Future<Result<HealthStatus>> ready() =>
+      _get(OneApiPaths.healthReady, HealthStatus.fromJson);
 
   /// `GET /api/v1/marketplace/search`.
   Future<Result<ListingPage>> searchListings(ListingQuery query) => _get(

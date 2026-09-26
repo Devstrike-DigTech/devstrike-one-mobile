@@ -1,37 +1,36 @@
 import 'package:meta/meta.dart';
 import 'package:one_api/src/json.dart';
 
-/// `GET /health`: `{ "status": "ok", ... }`.
+/// `GET /api/v1/health` (`{ status, role }`) or `GET /api/v1/health/ready`
+/// (`{ status, checks: { database, platformDatabase, redis } }`).
 @immutable
 class HealthStatus {
   /// Creates a health status.
-  const HealthStatus({
-    required this.status,
-    this.version,
-    this.details = const {},
-  });
+  const HealthStatus({required this.status, this.role, this.checks = const {}});
 
-  /// Parses the response body.
+  /// Parses either body.
   factory HealthStatus.fromJson(Json json) {
     final r = JsonReader(json);
+    final checks = r.objectOrNull('checks') ?? const <String, Object?>{};
     return HealthStatus(
       status: r.string('status'),
-      version: r.stringOrNull('version'),
-      details: Map.of(json)
-        ..remove('status')
-        ..remove('version'),
+      role: r.stringOrNull('role'),
+      checks: {
+        for (final MapEntry(:key, :value) in checks.entries)
+          if (value is String) key: value,
+      },
     );
   }
 
-  /// "ok" when every dependency is healthy.
+  /// "ok" when the service is up.
   final String status;
 
-  /// Build or git version, when reported.
-  final String? version;
+  /// Which process answered (`api` or `worker`).
+  final String? role;
 
-  /// Anything else the endpoint reports (database, redis...).
-  final Map<String, Object?> details;
+  /// Readiness checks by dependency (`ok` or `down`).
+  final Map<String, String> checks;
 
   /// Whether the service reports itself healthy.
-  bool get isOk => status == 'ok';
+  bool get isOk => status == 'ok' && checks.values.every((v) => v == 'ok');
 }

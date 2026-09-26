@@ -26,20 +26,18 @@ void main() {
   test('health parses the status', () async {
     adapter.onGet(
       OneApiPaths.health,
-      (s) => s.reply(200, {'status': 'ok', 'version': '0.1.0', 'db': 'up'}),
+      (s) => s.reply(200, {'status': 'ok', 'role': 'api'}),
     );
-    final result = await client.health();
-    final health = result.unwrap();
+    final health = (await client.health()).unwrap();
     expect(health.isOk, isTrue);
-    expect(health.version, '0.1.0');
-    expect(health.details['db'], 'up');
+    expect(health.role, 'api');
   });
 
   test('search sends the query and parses a page', () async {
     adapter.onGet(
       OneApiPaths.marketplaceSearch,
       (s) => s.reply(200, {
-        'items': [palmwineListing, minimalListing],
+        'items': [palmwineCard, minimalCard],
         'total': 2,
         'page': 1,
         'pageSize': 20,
@@ -59,7 +57,7 @@ void main() {
   test('listing detail escapes the id and parses', () async {
     adapter.onGet(
       OneApiPaths.marketplaceListing('abc/1'),
-      (s) => s.reply(200, palmwineListing),
+      (s) => s.reply(200, palmwineDetail),
     );
     expect(OneApiPaths.marketplaceListing('abc/1'), endsWith('abc%2F1'));
     final listing = (await client.getListing('abc/1')).unwrap();

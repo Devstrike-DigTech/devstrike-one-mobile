@@ -11,9 +11,12 @@ class ListingQuery {
     this.page = 1,
     this.pageSize = 20,
   }) : assert(page >= 1, 'page is 1-based'),
-       assert(pageSize > 0 && pageSize <= 100, 'pageSize is 1..100');
+       assert(pageSize > 0 && pageSize <= maxPageSize, 'pageSize is 1..48');
 
-  /// Free text ("rooftop bar Lekki").
+  /// Largest page core-api serves.
+  static const int maxPageSize = 48;
+
+  /// Free text ("rooftop bar Lekki"), at most 120 characters.
   final String text;
 
   /// Category prefix (`lodging`, `lodging.hotel`).

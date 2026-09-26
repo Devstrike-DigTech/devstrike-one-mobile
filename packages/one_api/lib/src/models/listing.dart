@@ -2,54 +2,77 @@ import 'package:flutter/foundation.dart';
 import 'package:one_api/src/json.dart';
 import 'package:one_core/one_core.dart';
 
-/// A marketplace listing as served by core-api: the One Listing v1 contract
-/// (`contracts/schemas/one-listing.json`) plus the fields One adds when it
-/// ingests a listing ([id] is One's UUIDv7, [externalId] the product's own
-/// id, [storeId], and the display name of the product).
+/// A marketplace listing as core-api serves it.
+///
+/// Products publish the One Listing v1 contract
+/// (`contracts/schemas/one-listing.json`); core-api normalises it and the
+/// marketplace endpoints return a projection of it: a *card* in search
+/// results and a *detail* from `GET /marketplace/listings/{id}`. This class
+/// reads both. The detail-only fields ([description], [images],
+/// [attributes], [phone], [whatsapp], [productSiteUrl], [updatedAt]) are
+/// empty or `null` on cards.
+///
+/// Mapping from One Listing v1: `title` is served as `name`, `location.*`
+/// flattened onto the listing with `location.point` as `geo`, `price` as
+/// `priceFrom { amountMinor, currency, unit }`, and `actions[0]` as
+/// `primaryAction`.
 @immutable
 class Listing {
   /// Creates a listing.
   const Listing({
     required this.id,
     required this.productKey,
+    required this.productName,
     required this.category,
     required this.title,
     required this.location,
-    required this.actions,
-    required this.updatedAt,
-    this.externalId,
-    this.tenantId,
-    this.storeId,
-    this.productName,
+    this.storeName,
+    this.slug,
+    this.subcategories = const [],
     this.summary,
     this.description,
     this.price,
     this.rating,
     this.images = const [],
     this.tags = const [],
+    this.primaryAction,
+    this.actions = const [],
+    this.bookingUrl,
     this.attributes = const {},
-    this.status = ListingStatus.active,
+    this.phone,
+    this.whatsapp,
+    this.productSiteUrl,
+    this.distanceKm,
+    this.updatedAt,
   });
 
-  /// Parses a listing; throws [FormatException] on contract drift.
+  /// Parses a search card or a detail body; throws [FormatException] (with
+  /// the field name) on contract drift.
   factory Listing.fromJson(Json json) {
     final r = JsonReader(json);
-    final product = r.objectOrNull('product');
+    final actions = r
+        .objects('actions')
+        .map(ListingAction.fromJson)
+        .toList(growable: false);
+    final primary = r.objectOrNull('primaryAction');
+    final images = r
+        .objects('images')
+        .map(ListingImage.fromJson)
+        .toList(growable: false);
+    final image = r.objectOrNull('image');
     return Listing(
       id: r.string('id'),
-      externalId: r.stringOrNull('externalId'),
       productKey: r.string('productKey'),
-      productName:
-          r.stringOrNull('productName') ??
-          (product == null ? null : JsonReader(product).stringOrNull('name')),
-      tenantId: r.stringOrNull('tenantId'),
-      storeId: r.stringOrNull('storeId'),
+      productName: r.stringOrNull('productName'),
+      storeName: r.stringOrNull('storeName'),
+      slug: r.stringOrNull('slug'),
+      title: r.string('name'),
       category: r.string('category'),
-      title: r.string('title'),
+      subcategories: r.strings('subcategories'),
       summary: r.stringOrNull('summary'),
       description: r.stringOrNull('description'),
-      location: ListingLocation.fromJson(r.object('location')),
-      price: switch (r.objectOrNull('price')) {
+      location: ListingLocation.fromJson(json),
+      price: switch (r.objectOrNull('priceFrom')) {
         null => null,
         final p => ListingPrice.fromJson(p),
       },
@@ -57,52 +80,55 @@ class Listing {
         null => null,
         final p => ListingRating.fromJson(p),
       },
-      images: r
-          .objects('images')
-          .map(ListingImage.fromJson)
-          .toList(growable: false),
+      images: images.isNotEmpty
+          ? images
+          : [if (image != null) ListingImage.fromJson(image)],
       tags: r.strings('tags'),
-      actions: r
-          .objects('actions')
-          .map(ListingAction.fromJson)
-          .toList(growable: false),
+      primaryAction: primary != null
+          ? ListingAction.fromJson(primary)
+          : (actions.isEmpty ? null : actions.first),
+      actions: actions,
+      bookingUrl: r.stringOrNull('bookingUrl'),
       attributes: switch (r.objectOrNull('attributes')) {
         null => const {},
         final a => Map.unmodifiable(a),
       },
-      status: ListingStatus.parse(r.stringOrNull('status')),
-      updatedAt: r.dateTime('updatedAt'),
+      phone: r.stringOrNull('phone'),
+      whatsapp: r.stringOrNull('whatsapp'),
+      productSiteUrl: r.stringOrNull('productSiteUrl'),
+      distanceKm: r.numberOrNull('distanceKm'),
+      updatedAt: json['updatedAt'] == null ? null : r.dateTime('updatedAt'),
     );
   }
 
   /// One's id for the listing (UUIDv7).
   final String id;
 
-  /// The product's own id for the listing.
-  final String? externalId;
-
   /// Registered product key, e.g. `hotel`.
   final String productKey;
 
-  /// Display name of the product ("HotelOS"), when the API includes it.
+  /// Display name of the product ("HotelOS").
   final String? productName;
 
-  /// The product tenant (== One store after linking).
-  final String? tenantId;
+  /// Name of the store (the business) that owns the listing.
+  final String? storeName;
 
-  /// One store id.
-  final String? storeId;
+  /// URL slug on the marketplace web.
+  final String? slug;
 
   /// Dotted category path, industry first: `lodging.hotel`.
   final String category;
 
-  /// Title.
+  /// Extra category paths.
+  final List<String> subcategories;
+
+  /// Title (served as `name`).
   final String title;
 
   /// One-line summary.
   final String? summary;
 
-  /// Long description (plain text).
+  /// Long description (plain text; detail only).
   final String? description;
 
   /// Where it is.
@@ -114,26 +140,38 @@ class Listing {
   /// Rating, or `null` when there are no reviews yet.
   final ListingRating? rating;
 
-  /// Images (https only per contract).
+  /// Images (all of them on detail, the cover on cards).
   final List<ListingImage> images;
 
   /// Free-form tags.
   final List<String> tags;
 
-  /// Deep links into the product's own flow; the first is the primary one.
+  /// How to continue in the product: its first action, else its booking page.
+  final ListingAction? primaryAction;
+
+  /// Every action (detail only).
   final List<ListingAction> actions;
 
-  /// Product-specific facts (flat scalars).
+  /// The product's booking page for this listing.
+  final String? bookingUrl;
+
+  /// Product-specific facts (flat scalars; detail only).
   final Map<String, Object?> attributes;
 
-  /// Visibility.
-  final ListingStatus status;
+  /// Contact phone (detail only).
+  final String? phone;
 
-  /// Last change at the source.
-  final DateTime updatedAt;
+  /// WhatsApp number (detail only).
+  final String? whatsapp;
 
-  /// The primary action, if any.
-  ListingAction? get primaryAction => actions.isEmpty ? null : actions.first;
+  /// The product's public site.
+  final String? productSiteUrl;
+
+  /// Distance from the `near` point of a search, in km.
+  final double? distanceKm;
+
+  /// Last change at the source (detail only).
+  final DateTime? updatedAt;
 
   /// The first image, if any.
   ListingImage? get coverImage => images.isEmpty ? null : images.first;
@@ -161,20 +199,7 @@ class Listing {
   String toString() => 'Listing($id, $title)';
 }
 
-/// Listing visibility.
-enum ListingStatus {
-  /// Shown in the marketplace.
-  active,
-
-  /// Hidden by the business or by moderation.
-  hidden;
-
-  /// Parses a status; unknown values are treated as [hidden] (fail closed).
-  static ListingStatus parse(String? value) =>
-      value == null || value == 'active' ? active : hidden;
-}
-
-/// Where a listing is.
+/// Where a listing is (flat fields on the listing, `geo` for coordinates).
 @immutable
 class ListingLocation {
   /// Creates a location.
@@ -187,21 +212,21 @@ class ListingLocation {
     this.point,
   });
 
-  /// Parses a location.
+  /// Reads the location fields from a listing body.
   factory ListingLocation.fromJson(Json json) {
     final r = JsonReader(json);
-    final point = r.objectOrNull('point');
+    final geo = r.objectOrNull('geo');
     return ListingLocation(
       address: r.stringOrNull('address'),
       area: r.stringOrNull('area'),
       city: r.string('city'),
       state: r.stringOrNull('state'),
       country: r.string('country'),
-      point: point == null
+      point: geo == null
           ? null
           : (
-              lat: JsonReader(point).number('lat'),
-              lng: JsonReader(point).number('lng'),
+              lat: JsonReader(geo).number('lat'),
+              lng: JsonReader(geo).number('lng'),
             ),
     );
   }
@@ -237,11 +262,11 @@ class ListingPrice {
   /// Creates a price.
   const ListingPrice({required this.from, this.unit});
 
-  /// Parses `{ fromMinor, currency, unit? }`.
+  /// Parses `{ amountMinor, currency, unit? }`.
   factory ListingPrice.fromJson(Json json) {
     final r = JsonReader(json);
     return ListingPrice(
-      from: Money(r.integer('fromMinor'), r.string('currency')),
+      from: Money(r.integer('amountMinor'), r.string('currency')),
       unit: r.stringOrNull('unit'),
     );
   }
@@ -322,11 +347,14 @@ class ListingAction {
   /// Creates an action.
   const ListingAction({required this.kind, required this.url, this.label});
 
-  /// Parses `{ kind, url, label? }`.
+  /// Parses `{ kind, url, label? }`. Only http(s) URLs are accepted, so a
+  /// listing can never make the app open another scheme.
   factory ListingAction.fromJson(Json json) {
     final r = JsonReader(json);
     final url = Uri.tryParse(r.string('url'));
-    if (url == null || !(url.isScheme('https') || url.isScheme('http'))) {
+    if (url == null ||
+        !(url.isScheme('https') || url.isScheme('http')) ||
+        url.host.isEmpty) {
       throw FormatException('action url must be http(s): ${json['url']}');
     }
     return ListingAction(

@@ -9,7 +9,7 @@ Two apps and four shared packages, one Dart pub workspace, orchestrated with mel
 | `apps/one_business` | **One Business**, the owner app: One ID sign-in, store switcher, dashboard, Inbox / Books / Insights (honest "coming in One-x" states for now) |
 | `packages/one_core` | Flavours and `OneConfig` (from `--dart-define`), logging with secret redaction, `Result` / `OneFailure`, `Money` (integer minor units), clock |
 | `packages/one_ui` | The **Devstrike One: Aso-oke** design system: tokens generated from the TypeScript repo, light and dark `ThemeData`, Newsreader / Public Sans / Martian Mono, curated Phosphor icons, the woven-band motif, core components |
-| `packages/one_api` | Typed core-api client (dio): health, marketplace search, listing detail, models following the One Listing v1 contract |
+| `packages/one_api` | Typed core-api client (dio): health, marketplace search with facets, listing detail, models for core-api's projection of the One Listing v1 contract |
 | `packages/one_auth` | One ID: OIDC authorization code + PKCE through the system browser (`flutter_appauth`), tokens in the keystore (`flutter_secure_storage`), a Riverpod session with single-flight refresh |
 | `tool/sync_tokens.dart` | Regenerates `one_ui` tokens from `devstrike-one/packages/design-tokens/tokens.json` |
 | `config/*.json` | Per-flavour `--dart-define-from-file` values |
@@ -97,6 +97,14 @@ networking. Xcode schemes and configurations per flavour are an open item.
 
 ## One ID sign-in
 
+> **Not yet registered in core-api.** At the time of writing, core-api's One ID client registry knows only
+> the three first-party web apps (confidential clients) and product clients. The two apps need public
+> native clients (`token_endpoint_auth_method: none`, `application_type: native`, PKCE required,
+> `grant_types: [authorization_code, refresh_token]`) with the redirect URIs below, plus refresh-token
+> issuance for `offline_access`. Until then the sign-in button reaches One ID and gets `invalid_client`.
+> The apps request the scopes from `devstrike-one/docs/04-identity-one-id.md` (`one:customer`,
+> `one:orgs`); core-api currently declares a single `one` scope, so one side has to move.
+
 Both apps are public OIDC clients of One ID (core-api `/oidc`, the `oidc-provider` library), using
 authorization code + PKCE (S256) in the system browser (Custom Tabs / `ASWebAuthenticationSession`).
 
@@ -138,8 +146,9 @@ Flutter-side shape (`Color` constants a `ThemeExtension` can use) is ours. After
 
 ## API client
 
-`one_api` is hand-written for the three endpoints that exist in One-0 (`GET /health`,
-`GET /api/v1/marketplace/search`, `GET /api/v1/marketplace/listings/{id}`). All paths live in
+`one_api` is hand-written for the endpoints that exist in One-0 (`GET /api/v1/health` and
+`/health/ready`, `GET /api/v1/marketplace/search`, `GET /api/v1/marketplace/listings/{id}`), with models
+that read core-api's marketplace projection of the One Listing v1 contract. All paths live in
 `OneApiPaths`. When core-api publishes its OpenAPI document, the plan is to generate the models and
 endpoints with `openapi-generator` (`dart-dio` generator) into `packages/one_api/lib/src/generated/`,
 keep `OneApiClient` as the facade the apps use (so screens do not change), and delete the hand-written

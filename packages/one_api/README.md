@@ -15,15 +15,23 @@ switch (await api.searchListings(const ListingQuery(text: 'Lekki'))) {
 
 | Method | Endpoint |
 |---|---|
-| `health()` | `GET /health` |
-| `searchListings(ListingQuery)` | `GET /api/v1/marketplace/search?q=&category=&city=&page=&pageSize=` → `{ items, total, page, pageSize }` |
-| `getListing(id)` | `GET /api/v1/marketplace/listings/{id}` |
+| `health()` | `GET /api/v1/health` → `{ status, role }` |
+| `ready()` | `GET /api/v1/health/ready` → `{ status, checks }` (503 with `details` when a dependency is down) |
+| `searchListings(ListingQuery)` | `GET /api/v1/marketplace/search?q=&category=&city=&page=&pageSize=` → `{ items, total, page, pageSize, facets: { cities, categories } }` |
+| `getListing(id)` | `GET /api/v1/marketplace/listings/{id}` (a UUID) |
 
-`Listing` follows the One Listing v1 contract (`devstrike-one/packages/contracts/schemas/one-listing.json`)
-plus the fields One adds on ingestion (`id` as One's UUIDv7, `externalId`, `storeId`, `productName`).
-Parsing is strict about required fields and types (a missing `title` fails with the field name) and
-lenient where the contract allows growth: unknown action kinds degrade to `view`, unknown statuses to
-`hidden`, and money amounts may arrive as JSON numbers or as strings (Postgres `BIGINT`).
+Products publish listings in the One Listing v1 contract
+(`devstrike-one/packages/contracts/schemas/one-listing.json`); core-api's marketplace endpoints return a
+projection of it, and that projection is what `Listing` reads (from
+`apps/core-api/src/modules/marketplace/marketplace.service.ts`): a *card* in search results and a *detail*
+from the listing endpoint. The mapping: `title` is served as `name`, the `location` object is flattened onto
+the listing with `point` as `geo`, `price` becomes `priceFrom { amountMinor, currency, unit }`, and
+`actions[0]` (or the product's booking page) becomes `primaryAction`. Detail adds `description`, `images`,
+`actions`, `attributes`, `phone`, `whatsapp`, `productSiteUrl` and `updatedAt`.
+
+Parsing is strict about required fields and types (a missing `name` fails with the field name) and lenient
+where the contract allows growth: unknown action kinds degrade to `view`, only http(s) action URLs are
+accepted, and money amounts may arrive as JSON numbers or as strings (Postgres `BIGINT`).
 
 Errors map from the core-api envelope `{ statusCode, code, message, details? }`: 401 → `UnauthorizedFailure`,
 404 → `NotFoundFailure`, other 4xx keep their `code` and message, 5xx keep a generic message and are

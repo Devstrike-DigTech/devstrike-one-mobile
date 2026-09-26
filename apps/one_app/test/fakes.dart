@@ -36,18 +36,40 @@ class FakeAuthenticator implements OneAuthenticator {
   Future<void> endSession(TokenSet current) async => endSessions++;
 }
 
+/// Marketplace bodies shaped like core-api's (search card and detail).
 const Map<String, Object?> palmwine = {
   'id': '01926d4e-8a4b-7c3e-9f00-5a1b2c3d4e5f',
   'productKey': 'hotel',
   'productName': 'HotelOS',
-  'tenantId': '01926d4e-0000-7000-8000-000000000001',
+  'storeName': 'The Palmwine House',
+  'slug': 'the-palmwine-house',
+  'name': 'The Palmwine House',
   'category': 'lodging.hotel',
-  'title': 'The Palmwine House',
+  'subcategories': <Object?>[],
   'summary': 'A quiet boutique hotel two streets from the lagoon.',
-  'location': {'area': 'Lekki Phase 1', 'city': 'Lagos', 'country': 'NG'},
-  'price': {'fromMinor': 4500000, 'currency': 'NGN', 'unit': 'night'},
+  'address': '12 Admiralty Way',
+  'area': 'Lekki Phase 1',
+  'city': 'Lagos',
+  'state': 'Lagos',
+  'country': 'NG',
+  'geo': null,
+  'priceFrom': {'amountMinor': 4500000, 'currency': 'NGN', 'unit': 'night'},
   'rating': {'average': 4.6, 'count': 128},
+  'image': null,
   'tags': ['rooftop', 'pool'],
+  'bookingUrl': 'https://palmwine.hotelos.ng/book',
+  'primaryAction': {
+    'kind': 'book',
+    'label': 'Book a room',
+    'url': 'https://palmwine.hotelos.ng/book',
+  },
+  'distanceKm': null,
+};
+
+const Map<String, Object?> palmwineDetail = {
+  ...palmwine,
+  'description': 'Twenty-four rooms, a rooftop bar and a kitchen that takes jollof seriously.',
+  'images': <Object?>[],
   'actions': [
     {
       'kind': 'book',
@@ -56,22 +78,34 @@ const Map<String, Object?> palmwine = {
     },
   ],
   'attributes': {'checkIn': '14:00', 'hourlyStays': true},
-  'status': 'active',
   'updatedAt': '2026-09-20T10:15:00Z',
 };
 
 const Map<String, Object?> kinks = {
   'id': '01926d4e-8a4b-7c3e-9f00-000000000009',
   'productKey': 'salon',
-  'tenantId': '01926d4e-0000-7000-8000-000000000003',
+  'productName': null,
+  'storeName': 'Kinks & Co',
+  'slug': 'kinks-and-co',
+  'name': 'Kinks & Co',
   'category': 'beauty.hair_salon',
-  'title': 'Kinks & Co',
-  'location': {'area': 'Wuse II', 'city': 'Abuja', 'country': 'NG'},
-  'price': null,
+  'subcategories': <Object?>[],
+  'summary': null,
+  'address': 'Plot 4 Aminu Kano Crescent',
+  'area': 'Wuse II',
+  'city': 'Abuja',
+  'state': 'FCT',
+  'country': 'NG',
+  'geo': null,
+  'priceFrom': null,
   'rating': null,
-  'actions': [
-    {'kind': 'book', 'url': 'https://kinks.salonos.ng/book'},
-  ],
-  'status': 'active',
-  'updatedAt': '2026-09-21T08:00:00Z',
+  'image': null,
+  'tags': <Object?>[],
+  'bookingUrl': 'https://kinks.salonos.ng/book',
+  'primaryAction': {
+    'kind': 'view',
+    'label': null,
+    'url': 'https://kinks.salonos.ng/book',
+  },
+  'distanceKm': null,
 };
