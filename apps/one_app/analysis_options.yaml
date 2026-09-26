@@ -1,0 +1,11 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+include: ../../analysis_options.yaml
+
+linter:
+  rules:
+    # Apps are not libraries; widget classes document themselves by name.
+    public_member_api_docs: false
