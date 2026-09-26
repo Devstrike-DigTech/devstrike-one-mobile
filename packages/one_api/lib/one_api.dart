@@ -13,4 +13,5 @@ export 'src/models/health_status.dart';
 export 'src/models/listing.dart';
 export 'src/models/listing_page.dart';
 export 'src/models/listing_query.dart';
+export 'src/models/store.dart';
 export 'src/one_api_client.dart';

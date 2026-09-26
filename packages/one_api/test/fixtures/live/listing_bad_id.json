@@ -1,0 +1,5 @@
+{
+    "statusCode": 400,
+    "code": "BAD_REQUEST",
+    "message": "Validation failed (uuid is expected)"
+}

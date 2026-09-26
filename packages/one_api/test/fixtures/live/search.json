@@ -1,0 +1,275 @@
+{
+    "items": [
+        {
+            "id": "01a0def0-e2a0-7bc5-8f9d-671067a3ad5e",
+            "productKey": "hotel",
+            "productName": "HotelOS",
+            "storeName": "The Ikoyi Lantern",
+            "locationId": "e0f421e0-9d22-8ca2-84dc-e0e166dfe348",
+            "slug": "ikoyi-lantern-spa",
+            "name": "Lantern Spa, Ikoyi",
+            "category": "beauty.spa",
+            "subcategories": [],
+            "summary": "Shea butter massages and a steam room overlooking the lagoon.",
+            "address": "6 Bourdillon Road, Ikoyi",
+            "area": "Ikoyi",
+            "city": "Lagos",
+            "state": "Lagos",
+            "country": "NG",
+            "geo": {
+                "lat": 6.4543,
+                "lng": 3.4349
+            },
+            "priceFrom": {
+                "amountMinor": 3500000,
+                "currency": "NGN",
+                "unit": "session"
+            },
+            "rating": {
+                "average": 4.9,
+                "count": 76
+            },
+            "image": {
+                "alt": "Treatment room",
+                "url": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1600&q=80"
+            },
+            "tags": [
+                "massage",
+                "steam",
+                "shea_butter"
+            ],
+            "bookingUrl": "http://localhost:3000/h/ikoyi-lantern",
+            "primaryAction": {
+                "url": "http://localhost:3000/h/ikoyi-lantern",
+                "kind": "book",
+                "label": "Book a treatment"
+            },
+            "distanceKm": null
+        },
+        {
+            "id": "01a0def0-e2cf-7773-a2c2-8086d575d186",
+            "productKey": "salon",
+            "productName": "SalonOS",
+            "storeName": "Riverside Grooming",
+            "locationId": "721e7b75-e702-85e2-9298-0bee2bfe6a64",
+            "slug": "riverside-salon-lekki",
+            "name": "Riverside Salon, Lekki",
+            "category": "beauty.salon",
+            "subcategories": [
+                "beauty.braids_and_wigs"
+            ],
+            "summary": "Braids, locs and silk presses by appointment, six chairs.",
+            "address": "9 Admiralty Way, Lekki Phase 1",
+            "area": "Lekki Phase 1",
+            "city": "Lagos",
+            "state": "Lagos",
+            "country": "NG",
+            "geo": {
+                "lat": 6.4449,
+                "lng": 3.4751
+            },
+            "priceFrom": {
+                "amountMinor": 1500000,
+                "currency": "NGN",
+                "unit": "session"
+            },
+            "rating": {
+                "average": 4.8,
+                "count": 318
+            },
+            "image": null,
+            "tags": [
+                "braids",
+                "locs",
+                "natural_hair"
+            ],
+            "bookingUrl": "https://salon.devstrike.ng/riverside-salon-lekki",
+            "primaryAction": {
+                "url": "https://salon.devstrike.ng/riverside-salon-lekki",
+                "kind": "book",
+                "label": "Book a chair"
+            },
+            "distanceKm": null
+        },
+        {
+            "id": "01a0def0-e231-7c6a-8d10-f2da3e6a37f1",
+            "productKey": "hotel",
+            "productName": "HotelOS",
+            "storeName": "The Ikoyi Lantern",
+            "locationId": "c12b5d33-ae18-8e8e-b95d-74d2cc8c469d",
+            "slug": "ikoyi-lantern",
+            "name": "The Ikoyi Lantern",
+            "category": "lodging.hotel",
+            "subcategories": [
+                "lodging.boutique_hotel"
+            ],
+            "summary": "Quiet, tree-lined luxury off Bourdillon, with a lagoon-view pool.",
+            "address": "6 Bourdillon Road, Ikoyi",
+            "area": "Ikoyi",
+            "city": "Lagos",
+            "state": "Lagos",
+            "country": "NG",
+            "geo": {
+                "lat": 6.4541,
+                "lng": 3.4347
+            },
+            "priceFrom": {
+                "amountMinor": 24000000,
+                "currency": "NGN",
+                "unit": "night"
+            },
+            "rating": {
+                "average": 4.8,
+                "count": 164
+            },
+            "image": {
+                "alt": "Lagoon-view pool",
+                "url": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1600&q=80"
+            },
+            "tags": [
+                "pool",
+                "bar",
+                "gym",
+                "lagoon_view"
+            ],
+            "bookingUrl": "http://localhost:3000/h/ikoyi-lantern",
+            "primaryAction": {
+                "url": "http://localhost:3000/h/ikoyi-lantern",
+                "kind": "book",
+                "label": "Check dates"
+            },
+            "distanceKm": null
+        },
+        {
+            "id": "01a0def0-e295-7689-b51b-974ae36e3a31",
+            "productKey": "hotel",
+            "productName": "HotelOS",
+            "storeName": "Maitama Court",
+            "locationId": "e89d3cf7-58f3-8c8e-baae-150fd74f5199",
+            "slug": "maitama-court-ballroom",
+            "name": "Maitama Court Ballroom",
+            "category": "events.event_hall",
+            "subcategories": [],
+            "summary": "A ballroom for 400 with simultaneous interpretation booths.",
+            "address": "9 Mississippi Street, Maitama",
+            "area": "Maitama",
+            "city": "Abuja",
+            "state": "FCT",
+            "country": "NG",
+            "geo": {
+                "lat": 9.0869,
+                "lng": 7.4963
+            },
+            "priceFrom": {
+                "amountMinor": 320000000,
+                "currency": "NGN",
+                "unit": "day"
+            },
+            "rating": {
+                "average": 4.8,
+                "count": 22
+            },
+            "image": {
+                "alt": "Ballroom foyer",
+                "url": "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1600&q=80"
+            },
+            "tags": [
+                "conference",
+                "interpretation",
+                "secure"
+            ],
+            "bookingUrl": "http://localhost:3000/h/maitama-court",
+            "primaryAction": {
+                "url": "http://localhost:3000/h/maitama-court",
+                "kind": "enquire",
+                "label": "Ask about dates"
+            },
+            "distanceKm": null
+        }
+    ],
+    "total": 31,
+    "page": 1,
+    "pageSize": 4,
+    "facets": {
+        "cities": [
+            {
+                "name": "Lagos",
+                "count": 11
+            },
+            {
+                "name": "Abuja",
+                "count": 5
+            },
+            {
+                "name": "Enugu",
+                "count": 3
+            },
+            {
+                "name": "Ibadan",
+                "count": 3
+            },
+            {
+                "name": "Calabar",
+                "count": 2
+            },
+            {
+                "name": "Port Harcourt",
+                "count": 2
+            },
+            {
+                "name": "Benin City",
+                "count": 1
+            },
+            {
+                "name": "Jos",
+                "count": 1
+            },
+            {
+                "name": "Kano",
+                "count": 1
+            },
+            {
+                "name": "Owerri",
+                "count": 1
+            },
+            {
+                "name": "Uyo",
+                "count": 1
+            }
+        ],
+        "categories": [
+            {
+                "name": "lodging.hotel",
+                "count": 9
+            },
+            {
+                "name": "food.restaurant",
+                "count": 5
+            },
+            {
+                "name": "lodging.short_let",
+                "count": 5
+            },
+            {
+                "name": "beauty.salon",
+                "count": 3
+            },
+            {
+                "name": "events.event_hall",
+                "count": 3
+            },
+            {
+                "name": "beauty.barber",
+                "count": 2
+            },
+            {
+                "name": "beauty.spa",
+                "count": 2
+            },
+            {
+                "name": "lodging.guest_house",
+                "count": 2
+            }
+        ]
+    }
+}

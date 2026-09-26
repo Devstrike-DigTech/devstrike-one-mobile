@@ -8,6 +8,7 @@ import 'package:one_api/src/models/health_status.dart';
 import 'package:one_api/src/models/listing.dart';
 import 'package:one_api/src/models/listing_page.dart';
 import 'package:one_api/src/models/listing_query.dart';
+import 'package:one_api/src/models/store.dart';
 import 'package:one_core/one_core.dart';
 
 /// Supplies a bearer token for a request, or `null` to send none. Called per
@@ -72,22 +73,44 @@ class OneApiClient {
   Future<Result<Listing>> getListing(String id) =>
       _get(OneApiPaths.marketplaceListing(id), Listing.fromJson);
 
+  /// `GET /api/v1/accounts/stores` (needs a signed-in person): every store
+  /// the person can manage, across their organisations.
+  Future<Result<List<OneStore>>> myStores() => _getRaw(
+    OneApiPaths.myStores,
+    (body) => switch (body) {
+      final List<Object?> list => [
+        for (final (i, item) in list.indexed)
+          if (item is Map<String, Object?>)
+            OneStore.fromJson(item)
+          else
+            throw FormatException('stores[$i] must be an object'),
+      ],
+      _ => throw const FormatException(
+        'Expected a JSON list from ${OneApiPaths.myStores}',
+      ),
+    },
+  );
+
   Future<Result<T>> _get<T>(
     String path,
     T Function(Json json) parse, {
     Map<String, Object>? query,
+  }) => _getRaw(
+    path,
+    (body) => body is Map<String, Object?>
+        ? parse(body)
+        : throw FormatException('Expected a JSON object from $path'),
+    query: query,
+  );
+
+  Future<Result<T>> _getRaw<T>(
+    String path,
+    T Function(Object? body) parse, {
+    Map<String, Object>? query,
   }) async {
     try {
       final response = await _dio.get<Object?>(path, queryParameters: query);
-      final body = response.data;
-      if (body is! Map<String, Object?>) {
-        return Err(
-          UnexpectedFailure(
-            cause: FormatException('Expected a JSON object from $path'),
-          ),
-        );
-      }
-      return Ok(parse(body));
+      return Ok(parse(response.data));
     } on DioException catch (e) {
       final failure = failureFromDio(e);
       _log.warning('GET $path failed: ${failure.code}', e.error);

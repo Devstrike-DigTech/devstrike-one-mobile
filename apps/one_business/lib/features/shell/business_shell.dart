@@ -84,7 +84,10 @@ class StoreSwitcherButton extends ConsumerWidget {
     final selected = stores.where((s) => s.id == selectedId).firstOrNull;
     final title =
         selected?.name ?? (stores.isEmpty ? 'No store linked' : 'All stores');
-    final subtitle = selected?.productName ?? orgName ?? 'Your business';
+    final subtitle =
+        selected?.productName ??
+        orgName ??
+        (stores.isEmpty ? 'Your business' : stores.first.organizationName);
 
     return Semantics(
       button: true,
@@ -184,11 +187,11 @@ class _StoreSwitcherSheet extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('No stores linked yet', style: text.titleMedium),
+                          Text('No stores yet', style: text.titleMedium),
                           const SizedBox(height: OneSpaceTokens.s1),
                           Text(
-                            'Linking a HotelOS property to your One account arrives in One-1. '
-                            'Your stores will be listed here.',
+                            'Stores appear here once a product such as HotelOS is linked '
+                            'to one of your organisations.',
                             style: text.bodyMedium,
                           ),
                         ],
@@ -210,7 +213,7 @@ class _StoreSwitcherSheet extends ConsumerWidget {
               for (final store in stores)
                 _StoreRow(
                   title: store.name,
-                  subtitle: '${store.productName} · ${store.city}',
+                  subtitle: [store.productName, ?store.city].join(' · '),
                   selected: selectedId == store.id,
                   onTap: () {
                     ref.read(selectedStoreProvider.notifier).select(store.id);

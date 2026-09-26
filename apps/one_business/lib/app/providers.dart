@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:one_api/one_api.dart';
 import 'package:one_auth/one_auth.dart';
 import 'package:one_core/one_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,30 +44,28 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
   }
 }
 
-/// A store: an organisation's instance of a product (a hotel on HotelOS).
-@immutable
-class StoreSummary {
-  const StoreSummary({
-    required this.id,
-    required this.name,
-    required this.productName,
-    required this.city,
-  });
+/// The core-api client, authenticated with the session's access token.
+final apiClientProvider = Provider<OneApiClient>((ref) {
+  final client = OneApiClient(
+    baseUrl: ref.watch(appConfigProvider).apiBaseUrl,
+    clientName: 'one_business',
+    accessToken: () => ref.read(sessionProvider.notifier).accessToken(),
+  );
+  ref.onDispose(client.close);
+  return client;
+}, name: 'apiClient');
 
-  final String id;
-  final String name;
-  final String productName;
-  final String city;
-}
-
-/// The stores the signed-in person can manage.
-///
-/// Empty until One-1 ships store linking (`GET /api/v1/orgs/{orgId}/stores`
-/// in core-api); the UI already handles the empty case honestly.
-final storesProvider = FutureProvider<List<StoreSummary>>((ref) async {
-  ref.watch(sessionProvider.select((s) => s.isSignedIn));
-  return const [];
-}, name: 'stores');
+/// Every store the signed-in owner can manage, across organisations
+/// (`GET /api/v1/accounts/stores`). Empty when signed out.
+final storesProvider = FutureProvider<List<OneStore>>(
+  (ref) async {
+    final signedIn = ref.watch(sessionProvider.select((s) => s.isSignedIn));
+    if (!signedIn) return const [];
+    return (await ref.watch(apiClientProvider).myStores()).unwrap();
+  },
+  retry: (_, _) => null,
+  name: 'stores',
+);
 
 /// The store the owner is looking at; `null` means "all stores".
 final selectedStoreProvider = NotifierProvider<SelectedStoreNotifier, String?>(

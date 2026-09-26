@@ -13,4 +13,7 @@ abstract final class OneApiPaths {
   /// One listing by its One id (a UUID; anything else is a 400).
   static String marketplaceListing(String id) =>
       '/api/v1/marketplace/listings/${Uri.encodeComponent(id)}';
+
+  /// The signed-in person's stores across all their organisations.
+  static const String myStores = '/api/v1/accounts/stores';
 }

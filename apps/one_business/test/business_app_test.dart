@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
+import 'package:one_api/one_api.dart';
 import 'package:one_auth/one_auth.dart';
 import 'package:one_business/app/app.dart';
 import 'package:one_business/app/providers.dart';
@@ -9,9 +15,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fakes.dart';
 
+/// `GET /api/v1/accounts/stores` captured from the live core-api (six stores
+/// of Kolanut Hospitality: five on HotelOS, one on EateryOS).
+final Object? liveStores = jsonDecode(
+  File('test/fixtures/accounts_stores.json').readAsStringSync(),
+);
+
 Future<(FakeAuthenticator, InMemoryTokenStore)> pumpBusiness(
   WidgetTester tester, {
   TokenSet? stored,
+  Object? stores = const <Object?>[],
+  int storesStatus = 200,
 }) async {
   tester.view
     ..physicalSize = const Size(390, 844)
@@ -21,6 +35,9 @@ Future<(FakeAuthenticator, InMemoryTokenStore)> pumpBusiness(
   final prefs = await SharedPreferences.getInstance();
   final auth = FakeAuthenticator();
   final store = InMemoryTokenStore(stored);
+  final dio = Dio();
+  DioAdapter(dio: dio)
+      .onGet(OneApiPaths.myStores, (s) => s.reply(storesStatus, stores));
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -35,6 +52,13 @@ Future<(FakeAuthenticator, InMemoryTokenStore)> pumpBusiness(
         sharedPreferencesProvider.overrideWithValue(prefs),
         authenticatorProvider.overrideWithValue(auth),
         tokenStoreProvider.overrideWithValue(store),
+        apiClientProvider.overrideWith(
+          (ref) => OneApiClient(
+            baseUrl: Uri.parse('http://localhost:4100'),
+            dio: dio,
+            accessToken: () => ref.read(sessionProvider.notifier).accessToken(),
+          ),
+        ),
       ],
       child: const OneBusinessApp(),
     ),
@@ -63,8 +87,7 @@ void main() {
     await tester.tap(find.text('Sign in with One ID'));
     await tester.pumpAndSettle();
     expect(find.text('Welcome, Tunde'), findsOneWidget);
-    expect(find.text('Link your first store'), findsOneWidget);
-    expect(find.text('COMING IN ONE-1'), findsOneWidget);
+    expect(find.text('No stores yet'), findsOneWidget);
     expect(find.text('No store linked'), findsOneWidget);
     expect(find.text('PALMWINE HOSPITALITY'), findsOneWidget);
   });
@@ -90,7 +113,38 @@ void main() {
       find.bySemanticsLabel('Store: No store linked. Switch store'),
     );
     await tester.pumpAndSettle();
-    expect(find.text('No stores linked yet'), findsOneWidget);
+    expect(find.text('No stores yet'), findsWidgets);
+  });
+
+  testWidgets('lists the stores of the owner and switches between them', (
+    tester,
+  ) async {
+    await pumpBusiness(tester, stored: ownerTokens, stores: liveStores);
+    expect(find.text('6 STORES'), findsOneWidget);
+    expect(find.text('All stores'), findsOneWidget);
+    expect(find.text('PALMWINE HOSPITALITY'), findsOneWidget);
+    expect(find.text('The Palmwine House'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Store: All stores. Switch store'));
+    await tester.pumpAndSettle();
+    expect(find.text('Kolanut Kitchen'), findsWidgets);
+    await tester.tap(find.text('Maitama Court').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 STORE'), findsOneWidget);
+    expect(find.text('HOTELOS'), findsOneWidget);
+    expect(find.text('HotelOS · Abuja'), findsOneWidget);
+    expect(find.text('The Palmwine House'), findsNothing);
+  });
+
+  testWidgets('a failed store load offers a retry', (tester) async {
+    await pumpBusiness(
+      tester,
+      stored: ownerTokens,
+      stores: const {'statusCode': 500, 'message': 'boom'},
+      storesStatus: 500,
+    );
+    expect(find.text('Try again'), findsOneWidget);
   });
 
   testWidgets('signing out returns to sign-in and clears tokens', (

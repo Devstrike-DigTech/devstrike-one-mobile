@@ -6,7 +6,7 @@ Two apps and four shared packages, one Dart pub workspace, orchestrated with mel
 | Path | What it is |
 |---|---|
 | `apps/one_app` | **One**, the customer app: marketplace search across every Devstrike product, listing detail, "Continue on HotelOS" hand-off, One ID sign-in, settings |
-| `apps/one_business` | **One Business**, the owner app: One ID sign-in, store switcher, dashboard, Inbox / Books / Insights (honest "coming in One-x" states for now) |
+| `apps/one_business` | **One Business**, the owner app: One ID sign-in, store switcher over `GET /api/v1/accounts/stores`, stores on Home, Inbox / Books / Insights (honest "coming in One-x" states for now) |
 | `packages/one_core` | Flavours and `OneConfig` (from `--dart-define`), logging with secret redaction, `Result` / `OneFailure`, `Money` (integer minor units), clock |
 | `packages/one_ui` | The **Devstrike One: Aso-oke** design system: tokens generated from the TypeScript repo, light and dark `ThemeData`, Newsreader / Public Sans / Martian Mono, curated Phosphor icons, the woven-band motif, core components |
 | `packages/one_api` | Typed core-api client (dio): health, marketplace search with facets, listing detail, models for core-api's projection of the One Listing v1 contract |
@@ -97,13 +97,22 @@ networking. Xcode schemes and configurations per flavour are an open item.
 
 ## One ID sign-in
 
-> **Not yet registered in core-api.** At the time of writing, core-api's One ID client registry knows only
-> the three first-party web apps (confidential clients) and product clients. The two apps need public
-> native clients (`token_endpoint_auth_method: none`, `application_type: native`, PKCE required,
-> `grant_types: [authorization_code, refresh_token]`) with the redirect URIs below, plus refresh-token
-> issuance for `offline_access`. Until then the sign-in button reaches One ID and gets `invalid_client`.
-> The apps request the scopes from `devstrike-one/docs/04-identity-one-id.md` (`one:customer`,
-> `one:orgs`); core-api currently declares a single `one` scope, so one side has to move.
+Verified against the live core-api (One-0): the discovery document advertises S256, public clients
+(`none`), the `refresh_token` grant and the `one:customer` / `one:orgs` scopes; a scripted authorization
+code + PKCE exchange succeeded for both `one-app` and `one-business` with the staging and production
+redirect schemes, refresh tokens rotate, and an unregistered scheme is refused.
+`packages/one_auth/test/discovery_test.dart` checks each app's `OneAuthConfig` against the captured
+document with `discoveryProblems()`.
+
+**Android emulator and sign-in.** core-api advertises `http://localhost:4100/oidc` as its issuer, so from
+the emulator the `10.0.2.2` default reaches the API but not One ID (the issuer differs and the endpoints in
+the discovery document point at `localhost`). For sign-in on the emulator, forward the port and use
+localhost:
+
+```sh
+adb reverse tcp:4100 tcp:4100
+flutter run --flavor staging --dart-define-from-file=../../config/development.adb-reverse.json
+```
 
 Both apps are public OIDC clients of One ID (core-api `/oidc`, the `oidc-provider` library), using
 authorization code + PKCE (S256) in the system browser (Custom Tabs / `ASWebAuthenticationSession`).
@@ -147,8 +156,9 @@ Flutter-side shape (`Color` constants a `ThemeExtension` can use) is ours. After
 ## API client
 
 `one_api` is hand-written for the endpoints that exist in One-0 (`GET /api/v1/health` and
-`/health/ready`, `GET /api/v1/marketplace/search`, `GET /api/v1/marketplace/listings/{id}`), with models
-that read core-api's marketplace projection of the One Listing v1 contract. All paths live in
+`/health/ready`, `GET /api/v1/marketplace/search`, `GET /api/v1/marketplace/listings/{id}`,
+`GET /api/v1/accounts/stores`), with models that read core-api's marketplace cards and detail. Tests replay
+bodies captured from the live server (`packages/one_api/test/fixtures/live/`). All paths live in
 `OneApiPaths`. When core-api publishes its OpenAPI document, the plan is to generate the models and
 endpoints with `openapi-generator` (`dart-dio` generator) into `packages/one_api/lib/src/generated/`,
 keep `OneApiClient` as the facade the apps use (so screens do not change), and delete the hand-written
@@ -178,7 +188,6 @@ version is read from `.fvmrc`.
 - iOS flavour schemes; release signing (Play upload key, App Store certificates); app icons (the
   Flutter defaults are still in place).
 - Bundled font files for offline first launch.
-- Store list for One Business arrives with the One-1 accounts API.
 - Replace the hand-written API client with generated code once core-api serves OpenAPI.
 
 ---

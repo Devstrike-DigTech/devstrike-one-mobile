@@ -1,0 +1,128 @@
+[
+    {
+        "id": "01926f00-0000-7000-8000-000000000c01",
+        "name": "The Palmwine House",
+        "slug": "palmwine-house",
+        "city": "Lagos",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c01",
+        "createdAt": "2026-09-26T18:18:43.504Z",
+        "product": {
+            "key": "hotel",
+            "name": "HotelOS",
+            "siteUrl": "http://localhost:3000"
+        },
+        "listingCount": 2,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    },
+    {
+        "id": "01926f00-0000-7000-8000-000000000c02",
+        "name": "The Ikoyi Lantern",
+        "slug": "ikoyi-lantern",
+        "city": "Lagos",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c02",
+        "createdAt": "2026-09-26T18:18:43.506Z",
+        "product": {
+            "key": "hotel",
+            "name": "HotelOS",
+            "siteUrl": "http://localhost:3000"
+        },
+        "listingCount": 2,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    },
+    {
+        "id": "01926f00-0000-7000-8000-000000000c03",
+        "name": "Eko Tides Hotel",
+        "slug": "eko-tides",
+        "city": "Lagos",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c03",
+        "createdAt": "2026-09-26T18:18:43.508Z",
+        "product": {
+            "key": "hotel",
+            "name": "HotelOS",
+            "siteUrl": "http://localhost:3000"
+        },
+        "listingCount": 1,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    },
+    {
+        "id": "01926f00-0000-7000-8000-000000000c04",
+        "name": "Maitama Court",
+        "slug": "maitama-court",
+        "city": "Abuja",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c04",
+        "createdAt": "2026-09-26T18:18:43.510Z",
+        "product": {
+            "key": "hotel",
+            "name": "HotelOS",
+            "siteUrl": "http://localhost:3000"
+        },
+        "listingCount": 2,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    },
+    {
+        "id": "01926f00-0000-7000-8000-000000000c05",
+        "name": "Wuse Garden Suites",
+        "slug": "wuse-garden-suites",
+        "city": "Abuja",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c05",
+        "createdAt": "2026-09-26T18:18:43.512Z",
+        "product": {
+            "key": "hotel",
+            "name": "HotelOS",
+            "siteUrl": "http://localhost:3000"
+        },
+        "listingCount": 1,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    },
+    {
+        "id": "01926f00-0000-7000-8000-000000000c06",
+        "name": "Kolanut Kitchen",
+        "slug": "kolanut-kitchen",
+        "city": "Lagos",
+        "status": "active",
+        "externalTenantId": "01926f00-0000-7000-8000-000000000c06",
+        "createdAt": "2026-09-26T18:18:43.513Z",
+        "product": {
+            "key": "eatery",
+            "name": "EateryOS",
+            "siteUrl": "https://eatery.devstrike.ng"
+        },
+        "listingCount": 5,
+        "locationCount": 0,
+        "organization": {
+            "id": "01926f00-0000-7000-8000-0000000000a1",
+            "name": "Kolanut Hospitality"
+        },
+        "role": "owner"
+    }
+]

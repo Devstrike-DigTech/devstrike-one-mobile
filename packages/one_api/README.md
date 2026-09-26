@@ -19,6 +19,7 @@ switch (await api.searchListings(const ListingQuery(text: 'Lekki'))) {
 | `ready()` | `GET /api/v1/health/ready` → `{ status, checks }` (503 with `details` when a dependency is down) |
 | `searchListings(ListingQuery)` | `GET /api/v1/marketplace/search?q=&category=&city=&page=&pageSize=` → `{ items, total, page, pageSize, facets: { cities, categories } }` |
 | `getListing(id)` | `GET /api/v1/marketplace/listings/{id}` (a UUID) |
+| `myStores()` | `GET /api/v1/accounts/stores` (bearer token) → `OneStore[]` across the person's organisations |
 
 Products publish listings in the One Listing v1 contract
 (`devstrike-one/packages/contracts/schemas/one-listing.json`); core-api's marketplace endpoints return a
@@ -37,6 +38,9 @@ Errors map from the core-api envelope `{ statusCode, code, message, details? }`:
 404 → `NotFoundFailure`, other 4xx keep their `code` and message, 5xx keep a generic message and are
 retryable, connection problems → `NetworkFailure`, timeouts → `TimeoutFailure`, bad shapes →
 `UnexpectedFailure`.
+
+`test/live_fixtures_test.dart` replays bodies captured from the live core-api (`test/fixtures/live/`,
+with the capture commands in its README).
 
 ## Moving to generated code
 

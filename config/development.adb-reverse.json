@@ -1,0 +1,5 @@
+{
+  "ONE_FLAVOR": "staging",
+  "ONE_API_BASE_URL": "http://localhost:4100",
+  "ONE_OIDC_ISSUER": "http://localhost:4100/oidc"
+}

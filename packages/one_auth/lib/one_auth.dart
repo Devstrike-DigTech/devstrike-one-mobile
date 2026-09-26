@@ -7,6 +7,7 @@
 library;
 
 export 'src/authenticator.dart';
+export 'src/discovery_check.dart';
 export 'src/id_token_claims.dart';
 export 'src/one_auth_config.dart';
 export 'src/providers.dart';
