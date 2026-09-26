@@ -1,0 +1,22 @@
+name: one_api
+description: Typed HTTP client for the Devstrike One core API (health, marketplace search, listing detail).
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  dio: ^5.11.1
+  flutter:
+    sdk: flutter
+  meta: ^1.16.0
+  one_core: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  http_mock_adapter: ^0.6.1
+  very_good_analysis: ^11.0.0
