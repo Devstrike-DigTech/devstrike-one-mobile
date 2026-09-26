@@ -1,0 +1,23 @@
+name: one_auth
+description: One ID sign-in for the Devstrike One apps (OIDC authorization code + PKCE, secure token storage, Riverpod session).
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_appauth: ^12.1.0
+  flutter_riverpod: ^3.4.3
+  flutter_secure_storage: ^11.2.0
+  meta: ^1.16.0
+  one_core: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^11.0.0
